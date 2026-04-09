@@ -4,6 +4,7 @@ import { getBlockValue } from 'notion-utils'
 import * as React from 'react'
 
 import type {
+  BlockWrapperProps,
   MapImageUrlFn,
   MapPageUrlFn,
   NotionComponents,
@@ -82,6 +83,8 @@ export function NotionRenderer({
   blockId?: string
   hideBlockId?: boolean
   disableHeader?: boolean
+
+  BlockWrapper?: React.FC<BlockWrapperProps>
 }) {
   const zoom = React.useMemo(
     () =>
@@ -127,6 +130,7 @@ export function NotionRenderer({
 export function NotionBlockRenderer({
   level = 0,
   blockId,
+  BlockWrapper,
   ...props
 }: {
   className?: string
@@ -138,6 +142,8 @@ export function NotionBlockRenderer({
   blockId?: string
   hideBlockId?: boolean
   level?: number
+
+  BlockWrapper?: React.FC<BlockWrapperProps>
 }) {
   const { recordMap } = useNotionContext()
   const id = blockId || Object.keys(recordMap.block)[0]!
@@ -151,17 +157,26 @@ export function NotionBlockRenderer({
     return null
   }
 
-  return (
+  const content = (
     <Block key={id} level={level} block={block} {...props}>
       {block?.content?.map((contentBlockId) => (
         <NotionBlockRenderer
           key={contentBlockId}
           blockId={contentBlockId}
           level={level + 1}
+          BlockWrapper={BlockWrapper}
           {...props}
         />
       ))}
     </Block>
+  )
+
+  return BlockWrapper ? (
+    <BlockWrapper key={`w_${id}`} level={level} blockId={id} block={block}>
+      {content}
+    </BlockWrapper>
+  ) : (
+    content
   )
 }
 

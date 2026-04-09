@@ -101,3 +101,10 @@ export interface CollectionGroupProps {
   summaryProps: any
   detailsProps: any
 }
+
+export type BlockWrapperProps = {
+  blockId: string
+  block: types.Block
+  level: number
+  children: React.ReactNode
+}
